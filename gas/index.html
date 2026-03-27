@@ -437,6 +437,85 @@ iframe {
 
 .save-btn:hover { opacity: 0.85; }
 
+/* ── 2カラム分割レイアウト ── */
+.split-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.split-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  min-height: 260px;
+}
+
+.split-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.split-panel-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.split-panel-action {
+  font-size: 12px;
+  color: var(--accent-blue);
+  cursor: pointer;
+}
+
+.split-panel-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  max-height: 320px;
+}
+
+.chat-open-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  color: var(--text-muted);
+  font-size: 13px;
+  text-align: center;
+}
+
+.chat-open-icon { font-size: 40px; }
+
+.chat-open-btn {
+  background: var(--accent-blue);
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: var(--font-main);
+  transition: opacity 0.15s;
+}
+.chat-open-btn:hover { opacity: 0.85; }
+
 /* ── メールリスト ── */
 .mail-list, .cal-list {
   display: flex;
@@ -558,29 +637,47 @@ iframe {
         <p>jhori1@otsukacorp.co.jp のポータル</p>
       </div>
 
-      <div class="stats-row">
-        <div class="stat-card blue" onclick="openService('gmail', null)">
-          <div class="stat-label">Gmail</div>
-          <div class="stat-value">✉️</div>
-          <div class="stat-sub">クリックして開く</div>
-        </div>
-        <div class="stat-card purple" onclick="openService('chat', null)">
-          <div class="stat-label">Google Chat</div>
-          <div class="stat-value">💬</div>
-          <div class="stat-sub">クリックして開く</div>
-        </div>
-        <div class="stat-card teal" onclick="openService('gas', null)">
-          <div class="stat-label">予定自動登録</div>
-          <div class="stat-value">🤖</div>
-          <div class="stat-sub">GASアプリ</div>
-        </div>
-        <div class="stat-card green" onclick="openService('senkou', null)">
-          <div class="stat-label">選考管理</div>
-          <div class="stat-value">📋</div>
-          <div class="stat-sub">社内システム</div>
-        </div>
+      <!-- 今日の予定（最上部） -->
+      <div class="section-header">
+        <div class="section-title">📅 今日の予定</div>
+        <span class="see-all" onclick="loadCalendar()">更新</span>
+      </div>
+      <div id="calendar-list" class="cal-list">
+        <div class="loading-prompt">読み込み中...</div>
       </div>
 
+      <!-- Gmail / Chat 分割 -->
+      <div class="split-row">
+
+        <!-- Gmail 未読 -->
+        <div class="split-panel">
+          <div class="split-panel-header">
+            <div class="split-panel-title">✉️ Gmail 未読</div>
+            <span class="split-panel-action" onclick="loadGmail()">更新</span>
+          </div>
+          <div class="split-panel-body" id="gmail-list">
+            <div class="loading-prompt">読み込み中...</div>
+          </div>
+        </div>
+
+        <!-- Google Chat -->
+        <div class="split-panel">
+          <div class="split-panel-header">
+            <div class="split-panel-title">💬 Google Chat</div>
+            <span class="split-panel-action" onclick="openService('chat', null)">開く ↗</span>
+          </div>
+          <div class="split-panel-body">
+            <div class="chat-open-area">
+              <div class="chat-open-icon">💬</div>
+              <div>ChatはiFrame埋め込みに<br>対応していないため<br>外部で開きます</div>
+              <button class="chat-open-btn" onclick="openService('chat', null)">Google Chatを開く</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- クイックアクセス -->
       <div class="section-header">
         <div class="section-title">クイックアクセス</div>
       </div>
@@ -606,24 +703,6 @@ iframe {
           <div class="service-name">公式LINE</div>
           <div class="service-desc">LINE管理画面</div>
         </div>
-      </div>
-
-      <!-- Gmail 未読 -->
-      <div class="section-header">
-        <div class="section-title">📬 Gmail 未読</div>
-        <span class="see-all" onclick="loadGmail()">更新</span>
-      </div>
-      <div id="gmail-list" class="mail-list">
-        <div class="loading-prompt">読み込み中...</div>
-      </div>
-
-      <!-- 今日の予定 -->
-      <div class="section-header">
-        <div class="section-title">📅 今日の予定</div>
-        <span class="see-all" onclick="loadCalendar()">更新</span>
-      </div>
-      <div id="calendar-list" class="cal-list">
-        <div class="loading-prompt">読み込み中...</div>
       </div>
 
       <div class="section-header">
