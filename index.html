@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MyPortal</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg-base: #0a0b0f;
+  --bg-card: #13151c;
+  --bg-card-hover: #1a1d27;
+  --bg-accent: #1e2130;
+  --border: rgba(255,255,255,0.07);
+  --border-hover: rgba(255,255,255,0.15);
+  --text-primary: #f0f2f8;
+  --text-secondary: #8890a8;
+  --text-muted: #4a5068;
+  --accent-blue: #4f8ef7;
+  --accent-purple: #8b6cf7;
+  --accent-teal: #2dd4bf;
+  --accent-green: #4ade80;
+  --accent-red: #f87171;
+  --accent-orange: #fb923c;
+  --font-main: 'Segoe UI', 'Noto Sans JP', sans-serif;
+}
+
+body {
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-main);
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+/* ── Header ── */
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 28px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(10,11,15,0.97);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.logo-icon {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #4f8ef7, #8b6cf7);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+}
+
+.logo span { color: var(--accent-blue); }
+
+.header-right { display: flex; align-items: center; gap: 16px; }
+
+.datetime { text-align: right; }
+.datetime .time { font-size: 20px; font-weight: 500; }
+.datetime .date { font-size: 12px; color: var(--text-secondary); }
+
+.avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4f8ef7, #8b6cf7);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+}
+
+/* ── Layout ── */
+.layout {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  min-height: calc(100vh - 65px);
+}
+
+/* ── Sidebar ── */
+nav {
+  border-right: 1px solid var(--border);
+  padding: 20px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.nav-section {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  padding: 14px 10px 6px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s;
+  border: 1px solid transparent;
+  user-select: none;
+}
+
+.nav-item:hover { background: var(--bg-card-hover); color: var(--text-primary); border-color: var(--border); }
+.nav-item.active { background: rgba(79,142,247,0.12); color: var(--accent-blue); border-color: rgba(79,142,247,0.2); }
+
+.nav-icon { width: 20px; text-align: center; font-size: 15px; flex-shrink: 0; }
+.nav-badge {
+  margin-left: auto;
+  background: var(--accent-red);
+  color: white;
+  font-size: 10px; font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 10px;
+}
+
+/* ── Main ── */
+main { padding: 24px 28px; overflow-y: auto; }
+
+.page { display: none; }
+.page.active { display: block; }
+
+/* ── Dashboard ── */
+.welcome { margin-bottom: 24px; }
+.welcome h1 { font-size: 22px; font-weight: 600; letter-spacing: -0.5px; }
+.welcome p { color: var(--text-secondary); font-size: 13.5px; margin-top: 4px; }
+
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 28px;
+}
+
+.stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+}
+
+.stat-card.blue::before { background: var(--accent-blue); }
+.stat-card.purple::before { background: var(--accent-purple); }
+.stat-card.teal::before { background: var(--accent-teal); }
+.stat-card.green::before { background: var(--accent-green); }
+.stat-card:hover { border-color: var(--border-hover); }
+
+.stat-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+.stat-value { font-size: 28px; font-weight: 600; margin: 6px 0 2px; letter-spacing: -1px; }
+.stat-sub { font-size: 12px; color: var(--text-secondary); }
+.stat-card.blue .stat-value { color: var(--accent-blue); }
+.stat-card.purple .stat-value { color: var(--accent-purple); }
+.stat-card.teal .stat-value { color: var(--accent-teal); }
+.stat-card.green .stat-value { color: var(--accent-green); }
+
+/* ── Section Header ── */
+.section-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.section-title {
+  font-size: 11px; font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.see-all { font-size: 12px; color: var(--accent-blue); cursor: pointer; }
+
+/* ── Services Grid ── */
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 28px;
+}
+
+.service-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-decoration: none;
+  color: inherit;
+}
+
+.service-card:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--border-hover);
+  transform: translateY(-2px);
+}
+
+.service-icon {
+  width: 48px; height: 48px;
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  overflow: hidden;
+}
+
+.service-icon img {
+  width: 32px; height: 32px;
+  object-fit: contain;
+}
+
+.service-name { font-size: 13px; font-weight: 500; }
+.service-desc { font-size: 11px; color: var(--text-muted); text-align: center; }
+
+/* ── Apps Grid ── */
+.apps-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 28px;
+}
+
+.app-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.app-card:hover { background: var(--bg-card-hover); border-color: var(--border-hover); }
+.app-card.dashed { border-style: dashed; }
+
+.app-top { display: flex; align-items: center; gap: 12px; }
+
+.nav-favicon {
+  width: 18px; height: 18px;
+  object-fit: contain;
+  border-radius: 3px;
+}
+
+.app-icon-box {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; flex-shrink: 0;
+  overflow: hidden;
+}
+
+.app-icon-box img {
+  width: 26px; height: 26px;
+  object-fit: contain;
+}
+
+.app-name { font-size: 13.5px; font-weight: 500; }
+
+.app-tag {
+  display: inline-block;
+  font-size: 10px;
+  padding: 2px 7px;
+  border-radius: 6px;
+  margin-top: 3px;
+  font-weight: 500;
+}
+
+.tag-active { background: rgba(74,222,128,0.12); color: var(--accent-green); }
+.tag-new { background: rgba(79,142,247,0.12); color: var(--accent-blue); }
+.tag-beta { background: rgba(139,108,247,0.12); color: var(--accent-purple); }
+
+.app-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+.app-launch { font-size: 12px; color: var(--text-muted); text-align: right; margin-top: 4px; }
+
+/* ── iFrame Viewer ── */
+.iframe-page-header {
+  display: flex; align-items: center; gap: 16px;
+  margin-bottom: 18px;
+}
+
+.back-btn {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: var(--font-main);
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.back-btn:hover { border-color: var(--border-hover); color: var(--text-primary); }
+
+.iframe-title { font-size: 16px; font-weight: 500; }
+.iframe-url-label { font-size: 12px; color: var(--text-muted); word-break: break-all; }
+
+.iframe-wrapper {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  height: calc(100vh - 210px);
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+}
+
+.iframe-topbar {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-accent);
+  flex-shrink: 0;
+}
+
+.dot { width: 10px; height: 10px; border-radius: 50%; }
+.dot-r { background: #f87171; }
+.dot-y { background: #fbbf24; }
+.dot-g { background: #4ade80; }
+
+.iframe-bar-url {
+  flex: 1;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 5px 12px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+iframe {
+  width: 100%;
+  flex: 1;
+  border: none;
+  display: block;
+  background: white;
+}
+
+.iframe-notice {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  height: 100%;
+  padding: 40px;
+  text-align: center;
+}
+
+.iframe-notice.show { display: flex; }
+
+.notice-icon { font-size: 48px; }
+.notice-title { font-size: 18px; font-weight: 500; }
+.notice-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.7; max-width: 400px; }
+
+.open-btn {
+  background: var(--accent-blue);
+  border: none;
+  color: white;
+  padding: 12px 28px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: var(--font-main);
+  transition: opacity 0.15s;
+}
+
+.open-btn:hover { opacity: 0.85; }
+
+/* ── Settings ── */
+.settings-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.settings-title {
+  font-size: 11px; font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.settings-row {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 12px;
+}
+
+.settings-label { font-size: 13px; color: var(--text-secondary); width: 130px; flex-shrink: 0; }
+
+.settings-input {
+  flex: 1;
+  background: var(--bg-accent);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-family: var(--font-main);
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.settings-input:focus { border-color: var(--accent-blue); }
+
+.save-btn {
+  background: var(--accent-blue);
+  border: none; color: white;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-size: 13px; font-weight: 500;
+  cursor: pointer;
+  font-family: var(--font-main);
+  margin-top: 8px;
+}
+
+.save-btn:hover { opacity: 0.85; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">⚡</div>
+    My<span>Portal</span>
+  </div>
+  <div class="header-right">
+    <div class="datetime">
+      <div class="time" id="clock">--:--</div>
+      <div class="date" id="datestr">---</div>
+    </div>
+    <div class="avatar" title="jhori1@otsukacorp.co.jp">堀</div>
+  </div>
+</header>
+
+<div class="layout">
+
+  <!-- Sidebar -->
+  <nav>
+    <div class="nav-section">メイン</div>
+    <div class="nav-item active" onclick="showPage('dashboard', this)">
+      <div class="nav-icon">⊞</div> ダッシュボード
+    </div>
+
+    <div class="nav-section">Google</div>
+    <div class="nav-item" onclick="openService('gmail', this)">
+      <div class="nav-icon"><img class="nav-favicon" src="https://www.google.com/s2/favicons?domain=mail.google.com&sz=64" alt="Gmail"></div> Gmail
+      <div class="nav-badge" id="badge-gmail">？</div>
+    </div>
+    <div class="nav-item" onclick="openService('chat', this)">
+      <div class="nav-icon"><img class="nav-favicon" src="https://www.google.com/s2/favicons?domain=chat.google.com&sz=64" alt="Chat"></div> Google Chat
+    </div>
+    <div class="nav-item" onclick="openService('calendar', this)">
+      <div class="nav-icon"><img class="nav-favicon" src="https://www.google.com/s2/favicons?domain=calendar.google.com&sz=64" alt="Calendar"></div> カレンダー
+    </div>
+
+    <div class="nav-section">SNS</div>
+    <div class="nav-item" onclick="openService('line', this)">
+      <div class="nav-icon"><img class="nav-favicon" src="https://www.google.com/s2/favicons?domain=manager.line.biz&sz=64" alt="LINE"></div> 公式LINE
+    </div>
+
+    <div class="nav-section">マイアプリ</div>
+    <div class="nav-item" onclick="openService('gas', this)">
+      <div class="nav-icon">📅</div> 予定自動登録
+    </div>
+    <div class="nav-item" onclick="openService('senkou', this)">
+      <div class="nav-icon">📋</div> 選考管理システム
+    </div>
+    <div class="nav-item" onclick="showPage('apps', this)">
+      <div class="nav-icon">🚀</div> アプリ一覧
+    </div>
+
+    <div class="nav-section">設定</div>
+    <div class="nav-item" onclick="showPage('settings', this)">
+      <div class="nav-icon">⚙</div> 設定
+    </div>
+  </nav>
+
+  <main>
+
+    <!-- ダッシュボード -->
+    <div class="page active" id="page-dashboard">
+      <div class="welcome">
+        <h1 id="greet-title">こんにちは 👋</h1>
+        <p>jhori1@otsukacorp.co.jp のポータル</p>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-card blue" onclick="openService('gmail', null)">
+          <div class="stat-label">Gmail</div>
+          <div class="stat-value"><img src="https://www.google.com/s2/favicons?domain=mail.google.com&sz=64" style="width:36px;height:36px;"></div>
+          <div class="stat-sub">クリックして開く</div>
+        </div>
+        <div class="stat-card purple" onclick="openService('chat', null)">
+          <div class="stat-label">Google Chat</div>
+          <div class="stat-value"><img src="https://www.google.com/s2/favicons?domain=chat.google.com&sz=64" style="width:36px;height:36px;"></div>
+          <div class="stat-sub">クリックして開く</div>
+        </div>
+        <div class="stat-card teal" onclick="openService('gas', null)">
+          <div class="stat-label">予定自動登録</div>
+          <div class="stat-value"><img src="https://www.google.com/s2/favicons?domain=script.google.com&sz=64" style="width:36px;height:36px;"></div>
+          <div class="stat-sub">GASアプリ</div>
+        </div>
+        <div class="stat-card green" onclick="openService('senkou', null)">
+          <div class="stat-label">選考管理</div>
+          <div class="stat-value">📋</div>
+          <div class="stat-sub">社内システム</div>
+        </div>
+      </div>
+
+      <div class="section-header">
+        <div class="section-title">クイックアクセス</div>
+      </div>
+
+      <div class="services-grid">
+        <div class="service-card" onclick="openService('gmail', null)">
+          <div class="service-icon" style="background:rgba(234,67,53,0.15);"><img src="https://www.google.com/s2/favicons?domain=mail.google.com&sz=64" alt="Gmail"></div>
+          <div class="service-name">Gmail</div>
+          <div class="service-desc">メールを確認する</div>
+        </div>
+        <div class="service-card" onclick="openService('chat', null)">
+          <div class="service-icon" style="background:rgba(26,115,232,0.15);"><img src="https://www.google.com/s2/favicons?domain=chat.google.com&sz=64" alt="Chat"></div>
+          <div class="service-name">Google Chat</div>
+          <div class="service-desc">チャットを確認する</div>
+        </div>
+        <div class="service-card" onclick="openService('calendar', null)">
+          <div class="service-icon" style="background:rgba(66,133,244,0.15);"><img src="https://www.google.com/s2/favicons?domain=calendar.google.com&sz=64" alt="Calendar"></div>
+          <div class="service-name">カレンダー</div>
+          <div class="service-desc">予定を確認する</div>
+        </div>
+        <div class="service-card" onclick="openService('line', null)">
+          <div class="service-icon" style="background:rgba(0,185,0,0.15);"><img src="https://www.google.com/s2/favicons?domain=manager.line.biz&sz=64" alt="LINE"></div>
+          <div class="service-name">公式LINE</div>
+          <div class="service-desc">LINE管理画面</div>
+        </div>
+      </div>
+
+      <div class="section-header">
+        <div class="section-title">マイアプリ</div>
+        <span class="see-all" onclick="showPage('apps', null)">すべて見る →</span>
+      </div>
+
+      <div class="apps-grid">
+        <div class="app-card" onclick="openService('gas', null)">
+          <div class="app-top">
+            <div class="app-icon-box" style="background:rgba(79,142,247,0.15);"><img src="https://www.google.com/s2/favicons?domain=script.google.com&sz=64" alt="GAS"></div>
+            <div>
+              <div class="app-name">予定自動登録アプリ</div>
+              <span class="app-tag tag-active">稼働中</span>
+            </div>
+          </div>
+          <div class="app-desc">GASで作成した予定自動登録Webアプリ</div>
+          <div class="app-launch">開く →</div>
+        </div>
+        <div class="app-card" onclick="openService('senkou', null)">
+          <div class="app-top">
+            <div class="app-icon-box" style="background:rgba(139,108,247,0.15);">📋</div>
+            <div>
+              <div class="app-name">選考管理システム</div>
+              <span class="app-tag tag-active">稼働中</span>
+            </div>
+          </div>
+          <div class="app-desc">社内選考管理システム（社内ネットワーク必須）</div>
+          <div class="app-launch">開く →</div>
+        </div>
+        <div class="app-card dashed" onclick="showAddPrompt()">
+          <div class="app-top">
+            <div class="app-icon-box" style="background:rgba(74,80,104,0.2);">➕</div>
+            <div>
+              <div class="app-name">アプリを追加</div>
+              <span class="app-tag tag-new">NEW</span>
+            </div>
+          </div>
+          <div class="app-desc">URLを登録してポータルからアクセス</div>
+          <div class="app-launch">追加する →</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- アプリ一覧 -->
+    <div class="page" id="page-apps">
+      <div class="welcome">
+        <h1>マイアプリ</h1>
+        <p>登録済みのアプリ一覧</p>
+      </div>
+      <div class="apps-grid" id="apps-grid">
+        <div class="app-card" onclick="openService('gas', null)">
+          <div class="app-top">
+            <div class="app-icon-box" style="background:rgba(79,142,247,0.15);"><img src="https://www.google.com/s2/favicons?domain=script.google.com&sz=64" alt="GAS"></div>
+            <div>
+              <div class="app-name">予定自動登録アプリ</div>
+              <span class="app-tag tag-active">稼働中</span>
+            </div>
+          </div>
+          <div class="app-desc">GASで作成した予定自動登録Webアプリ</div>
+          <div class="app-launch">開く →</div>
+        </div>
+        <div class="app-card" onclick="openService('senkou', null)">
+          <div class="app-top">
+            <div class="app-icon-box" style="background:rgba(139,108,247,0.15);">📋</div>
+            <div>
+              <div class="app-name">選考管理システム</div>
+              <span class="app-tag tag-active">稼働中</span>
+            </div>
+          </div>
+          <div class="app-desc">社内選考管理システム（社内ネットワーク必須）</div>
+          <div class="app-launch">開く →</div>
+        </div>
+        <div class="app-card dashed" onclick="showAddPrompt()">
+          <div class="app-top">
+            <div class="app-icon-box" style="background:rgba(74,80,104,0.2);">➕</div>
+            <div><div class="app-name">アプリを追加</div></div>
+          </div>
+          <div class="app-desc">URLを登録してポータルに追加する</div>
+          <div class="app-launch">追加する →</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 設定 -->
+    <div class="page" id="page-settings">
+      <div class="welcome">
+        <h1>設定</h1>
+        <p>ポータルのURL設定</p>
+      </div>
+
+      <div class="settings-panel">
+        <div class="settings-title">サービスURL</div>
+
+        <div class="settings-row">
+          <div class="settings-label">✉ Gmail</div>
+          <input class="settings-input" id="s-gmail" value="https://mail.google.com">
+        </div>
+        <div class="settings-row">
+          <div class="settings-label">💬 Google Chat</div>
+          <input class="settings-input" id="s-chat" value="https://chat.google.com">
+        </div>
+        <div class="settings-row">
+          <div class="settings-label">📅 カレンダー</div>
+          <input class="settings-input" id="s-calendar" value="https://calendar.google.com">
+        </div>
+        <div class="settings-row">
+          <div class="settings-label">🟢 公式LINE</div>
+          <input class="settings-input" id="s-line" value="https://manager.line.biz">
+        </div>
+        <div class="settings-row">
+          <div class="settings-label">📅 予定自動登録</div>
+          <input class="settings-input" id="s-gas" value="https://script.google.com/a/macros/otsukacorp.co.jp/s/AKfycbwHax1B7C_Drwf5kl-cuhtN_R1PVl22rgvCG3J3AG-fYt7PtWf5C-6kDL4VcJDQvmHjvA/exec">
+        </div>
+        <div class="settings-row">
+          <div class="settings-label">📋 選考管理</div>
+          <input class="settings-input" id="s-senkou" value="http://192.168.203.30/選考管理システム">
+        </div>
+
+        <button class="save-btn" onclick="saveSettings()">保存する</button>
+      </div>
+    </div>
+
+    <!-- iFrame ビューア -->
+    <div class="page" id="page-iframe">
+      <div class="iframe-page-header">
+        <button class="back-btn" onclick="goBack()">← 戻る</button>
+        <div style="flex:1; min-width:0;">
+          <div class="iframe-title" id="iframe-title">サービス</div>
+          <div class="iframe-url-label" id="iframe-url-label"></div>
+        </div>
+        <button class="back-btn" onclick="openExternal()">外部で開く ↗</button>
+      </div>
+
+      <div class="iframe-wrapper">
+        <div class="iframe-topbar">
+          <div class="dot dot-r"></div>
+          <div class="dot dot-y"></div>
+          <div class="dot dot-g"></div>
+          <div class="iframe-bar-url" id="iframe-bar-url"></div>
+        </div>
+
+        <!-- iframe本体 -->
+        <iframe id="main-iframe" src="about:blank" allow="fullscreen"></iframe>
+
+        <!-- iframeブロック時の代替表示 -->
+        <div class="iframe-notice" id="iframe-notice">
+          <div class="notice-icon">🔒</div>
+          <div class="notice-title">このサービスは埋め込み表示できません</div>
+          <div class="notice-desc">
+            GmailやGoogle Chatはセキュリティ上、iframe内での表示がブロックされています。<br>
+            ログイン済みのブラウザで新しいタブとして開いてください。
+          </div>
+          <button class="open-btn" onclick="openExternal()">新しいタブで開く ↗</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  // ── URL設定（localStorageで永続化） ──
+  const DEFAULT_URLS = {
+    gmail:    'https://mail.google.com',
+    chat:     'https://chat.google.com',
+    calendar: 'https://calendar.google.com',
+    line:     'https://manager.line.biz',
+    gas:      'https://script.google.com/a/macros/otsukacorp.co.jp/s/AKfycbwHax1B7C_Drwf5kl-cuhtN_R1PVl22rgvCG3J3AG-fYt7PtWf5C-6kDL4VcJDQvmHjvA/exec',
+    senkou:   'http://192.168.203.30/%E9%81%B8%E8%80%83%E7%AE%A1%E7%90%86%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0',
+  };
+
+  const SERVICE_NAMES = {
+    gmail: 'Gmail', chat: 'Google Chat', calendar: 'Googleカレンダー',
+    line: '公式LINE', gas: '予定自動登録アプリ', senkou: '選考管理システム',
+  };
+
+  // iframeブロックされるサービス（Googleのもの）
+  const BLOCKED_SERVICES = ['gmail', 'chat', 'calendar', 'line'];
+
+  function getUrls() {
+    try {
+      const saved = localStorage.getItem('portal_urls');
+      return saved ? { ...DEFAULT_URLS, ...JSON.parse(saved) } : { ...DEFAULT_URLS };
+    } catch { return { ...DEFAULT_URLS }; }
+  }
+
+  // ── 時計 ──
+  function updateClock() {
+    const now = new Date();
+    const h = String(now.getHours()).padStart(2, '0');
+    const m = String(now.getMinutes()).padStart(2, '0');
+    document.getElementById('clock').textContent = h + ':' + m;
+    const days = ['日','月','火','水','木','金','土'];
+    document.getElementById('datestr').textContent =
+      `${now.getMonth()+1}月${now.getDate()}日（${days[now.getDay()]}）`;
+    const greet = now.getHours() < 12 ? 'おはようございます 👋' :
+                  now.getHours() < 18 ? 'こんにちは 👋' : 'お疲れさまです 👋';
+    const el = document.getElementById('greet-title');
+    if (el) el.textContent = greet;
+  }
+  updateClock();
+  setInterval(updateClock, 30000);
+
+  // ── ページ切替 ──
+  let prevPage = 'dashboard';
+
+  function showPage(id, navEl) {
+    prevPage = document.querySelector('.page.active')?.id?.replace('page-', '') || 'dashboard';
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-' + id).classList.add('active');
+    if (navEl) {
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      navEl.classList.add('active');
+    }
+  }
+
+  function goBack() {
+    showPage(prevPage, null);
+  }
+
+  // ── サービスを開く ──
+  let currentUrl = '';
+
+  function openService(key, navEl) {
+    const urls = getUrls();
+    const url = urls[key];
+    const name = SERVICE_NAMES[key];
+    currentUrl = url;
+
+    document.getElementById('iframe-title').textContent = name;
+    document.getElementById('iframe-url-label').textContent = url;
+    document.getElementById('iframe-bar-url').textContent = url;
+
+    const iframe = document.getElementById('main-iframe');
+    const notice = document.getElementById('iframe-notice');
+
+    if (BLOCKED_SERVICES.includes(key)) {
+      // ブロックされるサービスは通知表示
+      iframe.style.display = 'none';
+      notice.classList.add('show');
+      iframe.src = 'about:blank';
+    } else {
+      // 埋め込み可能なアプリはiframeで表示
+      iframe.style.display = 'block';
+      notice.classList.remove('show');
+      iframe.src = url;
+    }
+
+    showPage('iframe', navEl);
+    if (navEl) {
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      navEl.classList.add('active');
+    }
+  }
+
+  function openExternal() {
+    if (currentUrl) window.open(currentUrl, '_blank');
+  }
+
+  // ── 設定の保存 ──
+  function saveSettings() {
+    const urls = {
+      gmail:    document.getElementById('s-gmail').value,
+      chat:     document.getElementById('s-chat').value,
+      calendar: document.getElementById('s-calendar').value,
+      line:     document.getElementById('s-line').value,
+      gas:      document.getElementById('s-gas').value,
+      senkou:   document.getElementById('s-senkou').value,
+    };
+    try {
+      localStorage.setItem('portal_urls', JSON.stringify(urls));
+      alert('✅ 設定を保存しました！');
+    } catch {
+      alert('保存に失敗しました');
+    }
+  }
+
+  // ── 設定画面にデフォルト値をセット ──
+  function loadSettings() {
+    const urls = getUrls();
+    document.getElementById('s-gmail').value = urls.gmail;
+    document.getElementById('s-chat').value = urls.chat;
+    document.getElementById('s-calendar').value = urls.calendar;
+    document.getElementById('s-line').value = urls.line;
+    document.getElementById('s-gas').value = urls.gas;
+    document.getElementById('s-senkou').value = urls.senkou;
+  }
+  loadSettings();
+
+  // ── アプリ追加（シンプル版） ──
+  function showAddPrompt() {
+    const name = prompt('アプリ名を入力してください');
+    if (!name) return;
+    const url = prompt('URLを入力してください（例: https://your-app.com）');
+    if (!url) return;
+    alert(`「${name}」を追加しました！\nURLを設定画面で登録すると永続化できます。`);
+  }
+</script>
+</body>
+</html>
