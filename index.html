@@ -452,7 +452,80 @@ iframe {
 }
 
 .save-btn:hover { opacity: 0.85; }
+
+/* ── Google連携パネル ── */
+.google-connect-btn {
+  background: var(--accent-blue);
+  color: white;
+  border: none;
+  padding: 10px 22px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: var(--font-main);
+  transition: opacity 0.15s;
+}
+.google-connect-btn:hover { opacity: 0.85; }
+
+.auth-prompt {
+  text-align: center;
+  padding: 22px;
+  color: var(--text-muted);
+  font-size: 13px;
+  background: var(--bg-card);
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+/* ── メールリスト ── */
+.mail-list, .cal-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 28px;
+}
+
+.mail-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.mail-item:hover { background: var(--bg-card-hover); border-color: var(--border-hover); }
+
+.mail-from { font-size: 12px; color: var(--text-muted); margin-bottom: 3px; }
+.mail-subject { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+.mail-snippet { font-size: 12px; color: var(--text-secondary); margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* ── カレンダーリスト ── */
+.cal-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent-blue);
+  border-radius: 12px;
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+.cal-item:hover { background: var(--bg-card-hover); border-color: var(--border-hover); border-left-color: var(--accent-blue); }
+
+.cal-time { font-size: 13px; font-weight: 700; color: var(--accent-blue); min-width: 90px; flex-shrink: 0; padding-top: 2px; }
+.cal-content { flex: 1; }
+.cal-title { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+.cal-location { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
 </style>
+<script src="https://accounts.google.com/gsi/client" async></script>
 </head>
 <body>
 
@@ -612,6 +685,30 @@ iframe {
           <div class="app-launch">追加する →</div>
         </div>
       </div>
+
+      <!-- Gmail 未読 -->
+      <div class="section-header">
+        <div class="section-title">📬 Gmail 未読</div>
+        <span class="see-all" onclick="fetchGmailData()">更新</span>
+      </div>
+      <div id="gmail-list" class="mail-list">
+        <div class="auth-prompt">
+          <div>Googleと連携してGmail未読を表示できます</div>
+          <button class="google-connect-btn" onclick="requestGoogleAccess()">Googleと連携する</button>
+        </div>
+      </div>
+
+      <!-- 今日の予定 -->
+      <div class="section-header">
+        <div class="section-title">📅 今日の予定</div>
+        <span class="see-all" onclick="fetchCalendarData()">更新</span>
+      </div>
+      <div id="calendar-list" class="cal-list">
+        <div class="auth-prompt">
+          <div>Googleと連携して今日の予定を表示できます</div>
+        </div>
+      </div>
+
     </div>
 
     <!-- アプリ一覧 -->
@@ -690,6 +787,19 @@ iframe {
         </div>
 
         <button class="save-btn" onclick="saveSettings()">保存する</button>
+      </div>
+
+      <div class="settings-panel">
+        <div class="settings-title">Google API 連携</div>
+        <div class="settings-row">
+          <div class="settings-label">OAuth クライアントID</div>
+          <input class="settings-input" id="s-client-id" placeholder="xxxx.apps.googleusercontent.com">
+        </div>
+        <div style="font-size:12px; color:var(--text-muted); margin-bottom:12px; line-height:1.7;">
+          Google Cloud Console → APIとサービス → 認証情報 → OAuth 2.0クライアントID<br>
+          承認済みのJavaScriptオリジンに <strong>https://otsukahori.github.io</strong> を追加してください
+        </div>
+        <button class="save-btn" onclick="saveClientId()">保存してログイン</button>
       </div>
     </div>
 
@@ -859,6 +969,169 @@ iframe {
     document.getElementById('s-senkou').value = urls.senkou;
   }
   loadSettings();
+
+  // ── Google API 連携 ──
+  const SCOPES = 'https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/calendar.readonly';
+  let tokenClient = null;
+  let accessToken = null;
+
+  function getClientId() {
+    return localStorage.getItem('google_client_id') || '';
+  }
+
+  function saveClientId() {
+    const id = document.getElementById('s-client-id').value.trim();
+    if (!id) { alert('クライアントIDを入力してください'); return; }
+    localStorage.setItem('google_client_id', id);
+    initGoogleAuth(id);
+    requestGoogleAccess();
+  }
+
+  function initGoogleAuth(clientId) {
+    if (!clientId || typeof google === 'undefined') return;
+    tokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: clientId,
+      scope: SCOPES,
+      callback: handleToken
+    });
+  }
+
+  function requestGoogleAccess() {
+    if (!tokenClient) {
+      const id = getClientId();
+      if (!id) { alert('設定画面でGoogle OAuth クライアントIDを入力してください'); showPage('settings', null); return; }
+      initGoogleAuth(id);
+    }
+    if (tokenClient) tokenClient.requestAccessToken();
+  }
+
+  function handleToken(resp) {
+    if (resp.error) { console.error(resp); return; }
+    accessToken = resp.access_token;
+    const exp = Date.now() + (resp.expires_in - 60) * 1000;
+    localStorage.setItem('g_access_token', accessToken);
+    localStorage.setItem('g_token_exp', String(exp));
+    fetchGmailData();
+    fetchCalendarData();
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  async function fetchGmailData() {
+    if (!accessToken) return;
+    const el = document.getElementById('gmail-list');
+    el.innerHTML = '<div class="auth-prompt">読み込み中...</div>';
+    try {
+      const listRes = await fetch(
+        'https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=5&q=is:unread+in:inbox',
+        { headers: { Authorization: 'Bearer ' + accessToken } }
+      );
+      if (listRes.status === 401) {
+        accessToken = null;
+        el.innerHTML = '<div class="auth-prompt"><button class="google-connect-btn" onclick="requestGoogleAccess()">再ログインして表示</button></div>';
+        return;
+      }
+      const listData = await listRes.json();
+      if (!listData.messages || listData.messages.length === 0) {
+        el.innerHTML = '<div class="auth-prompt">未読メールはありません ✅</div>';
+        return;
+      }
+      const msgs = await Promise.all(
+        listData.messages.slice(0, 5).map(m =>
+          fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/' + m.id + '?format=metadata&metadataHeaders=From&metadataHeaders=Subject',
+            { headers: { Authorization: 'Bearer ' + accessToken } }
+          ).then(r => r.json())
+        )
+      );
+      el.innerHTML = msgs.map(msg => {
+        const h = (msg.payload && msg.payload.headers) || [];
+        const from = (h.find(x => x.name === 'From') || {}).value || '不明';
+        const subject = (h.find(x => x.name === 'Subject') || {}).value || '(件名なし)';
+        const snippet = msg.snippet || '';
+        const fromName = from.replace(/\s*<[^>]+>/, '').trim() || from;
+        return '<div class="mail-item" onclick="openService(\'gmail\', null)">'
+          + '<div class="mail-from">' + escapeHtml(fromName) + '</div>'
+          + '<div class="mail-subject">' + escapeHtml(subject) + '</div>'
+          + '<div class="mail-snippet">' + escapeHtml(snippet.slice(0, 120)) + '</div>'
+          + '</div>';
+      }).join('');
+    } catch(e) {
+      el.innerHTML = '<div class="auth-prompt">取得に失敗しました</div>';
+      console.error(e);
+    }
+  }
+
+  async function fetchCalendarData() {
+    if (!accessToken) return;
+    const el = document.getElementById('calendar-list');
+    el.innerHTML = '<div class="auth-prompt">読み込み中...</div>';
+    const now = new Date();
+    const y = now.getFullYear(), mo = now.getMonth(), d = now.getDate();
+    const start = new Date(y, mo, d, 0, 0, 0).toISOString();
+    const end   = new Date(y, mo, d, 23, 59, 59).toISOString();
+    localStorage.setItem('cal_last_date', y + '-' + mo + '-' + d);
+    try {
+      const res = await fetch(
+        'https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin=' + encodeURIComponent(start) + '&timeMax=' + encodeURIComponent(end) + '&singleEvents=true&orderBy=startTime&maxResults=10',
+        { headers: { Authorization: 'Bearer ' + accessToken } }
+      );
+      if (res.status === 401) {
+        accessToken = null;
+        el.innerHTML = '<div class="auth-prompt"><button class="google-connect-btn" onclick="requestGoogleAccess()">再ログインして表示</button></div>';
+        return;
+      }
+      const data = await res.json();
+      if (!data.items || data.items.length === 0) {
+        el.innerHTML = '<div class="auth-prompt">今日の予定はありません 🎉</div>';
+        return;
+      }
+      el.innerHTML = data.items.map(ev => {
+        let timeStr = '終日';
+        if (ev.start.dateTime) {
+          const s = new Date(ev.start.dateTime);
+          const e2 = new Date(ev.end.dateTime);
+          timeStr = s.getHours() + ':' + String(s.getMinutes()).padStart(2,'0') + ' - ' + e2.getHours() + ':' + String(e2.getMinutes()).padStart(2,'0');
+        }
+        return '<div class="cal-item" onclick="openService(\'calendar\', null)">'
+          + '<div class="cal-time">' + timeStr + '</div>'
+          + '<div class="cal-content">'
+          + '<div class="cal-title">' + escapeHtml(ev.summary || '(タイトルなし)') + '</div>'
+          + (ev.location ? '<div class="cal-location">📍 ' + escapeHtml(ev.location) + '</div>' : '')
+          + '</div></div>';
+      }).join('');
+    } catch(e) {
+      el.innerHTML = '<div class="auth-prompt">取得に失敗しました</div>';
+      console.error(e);
+    }
+  }
+
+  // 日付が変わったらカレンダー自動更新
+  setInterval(() => {
+    const now = new Date();
+    const today = now.getFullYear() + '-' + now.getMonth() + '-' + now.getDate();
+    if (localStorage.getItem('cal_last_date') !== today && accessToken) {
+      fetchCalendarData();
+    }
+  }, 60000);
+
+  // ページ読み込み時：保存済みトークンがあれば復元
+  window.addEventListener('load', () => {
+    const saved = localStorage.getItem('g_access_token');
+    const exp = parseInt(localStorage.getItem('g_token_exp') || '0');
+    const clientId = getClientId();
+    if (clientId) document.getElementById('s-client-id').value = clientId;
+    if (saved && Date.now() < exp) {
+      accessToken = saved;
+      fetchGmailData();
+      fetchCalendarData();
+    }
+    if (clientId && typeof google !== 'undefined') {
+      initGoogleAuth(clientId);
+    }
+  });
 
   // ── アプリ追加（シンプル版） ──
   function showAddPrompt() {
