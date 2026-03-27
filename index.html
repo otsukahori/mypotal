@@ -8,21 +8,21 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg-base: #0a0b0f;
-  --bg-card: #13151c;
-  --bg-card-hover: #1a1d27;
-  --bg-accent: #1e2130;
-  --border: rgba(255,255,255,0.07);
-  --border-hover: rgba(255,255,255,0.15);
-  --text-primary: #f0f2f8;
-  --text-secondary: #8890a8;
-  --text-muted: #4a5068;
-  --accent-blue: #4f8ef7;
-  --accent-purple: #8b6cf7;
-  --accent-teal: #2dd4bf;
-  --accent-green: #4ade80;
-  --accent-red: #f87171;
-  --accent-orange: #fb923c;
+  --bg-base: #f0f4fb;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f5f7ff;
+  --bg-accent: #e8edf8;
+  --border: rgba(0,0,0,0.09);
+  --border-hover: rgba(0,0,0,0.20);
+  --text-primary: #1a1d2e;
+  --text-secondary: #5a6080;
+  --text-muted: #9aa0b8;
+  --accent-blue: #3b7ef0;
+  --accent-purple: #7c5ce8;
+  --accent-teal: #10b8a6;
+  --accent-green: #22c55e;
+  --accent-red: #ef4444;
+  --accent-orange: #f97316;
   --font-main: 'Segoe UI', 'Noto Sans JP', sans-serif;
 }
 
@@ -41,7 +41,7 @@ header {
   justify-content: space-between;
   padding: 14px 28px;
   border-bottom: 1px solid var(--border);
-  background: rgba(10,11,15,0.97);
+  background: rgba(240,244,251,0.97);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -481,19 +481,19 @@ iframe {
 
     <div class="nav-section">Google</div>
     <div class="nav-item" onclick="openService('gmail', this)">
-      <div class="nav-icon"><img class="nav-favicon" src="https://www.google.com/s2/favicons?domain=mail.google.com&sz=64" alt="Gmail"></div> Gmail
+      <div class="nav-icon">✉️</div> Gmail
       <div class="nav-badge" id="badge-gmail">？</div>
     </div>
     <div class="nav-item" onclick="openService('chat', this)">
-      <div class="nav-icon"><img class="nav-favicon" src="https://www.google.com/s2/favicons?domain=chat.google.com&sz=64" alt="Chat"></div> Google Chat
+      <div class="nav-icon">💬</div> Google Chat
     </div>
     <div class="nav-item" onclick="openService('calendar', this)">
-      <div class="nav-icon"><img class="nav-favicon" src="https://www.google.com/s2/favicons?domain=calendar.google.com&sz=64" alt="Calendar"></div> カレンダー
+      <div class="nav-icon">📅</div> カレンダー
     </div>
 
     <div class="nav-section">SNS</div>
     <div class="nav-item" onclick="openService('line', this)">
-      <div class="nav-icon"><img class="nav-favicon" src="https://www.google.com/s2/favicons?domain=manager.line.biz&sz=64" alt="LINE"></div> 公式LINE
+      <div class="nav-icon">💚</div> 公式LINE
     </div>
 
     <div class="nav-section">マイアプリ</div>
@@ -525,17 +525,17 @@ iframe {
       <div class="stats-row">
         <div class="stat-card blue" onclick="openService('gmail', null)">
           <div class="stat-label">Gmail</div>
-          <div class="stat-value"><img src="https://www.google.com/s2/favicons?domain=mail.google.com&sz=64" style="width:36px;height:36px;"></div>
+          <div class="stat-value">✉️</div>
           <div class="stat-sub">クリックして開く</div>
         </div>
         <div class="stat-card purple" onclick="openService('chat', null)">
           <div class="stat-label">Google Chat</div>
-          <div class="stat-value"><img src="https://www.google.com/s2/favicons?domain=chat.google.com&sz=64" style="width:36px;height:36px;"></div>
+          <div class="stat-value">💬</div>
           <div class="stat-sub">クリックして開く</div>
         </div>
         <div class="stat-card teal" onclick="openService('gas', null)">
           <div class="stat-label">予定自動登録</div>
-          <div class="stat-value"><img src="https://www.google.com/s2/favicons?domain=script.google.com&sz=64" style="width:36px;height:36px;"></div>
+          <div class="stat-value">🤖</div>
           <div class="stat-sub">GASアプリ</div>
         </div>
         <div class="stat-card green" onclick="openService('senkou', null)">
@@ -551,22 +551,22 @@ iframe {
 
       <div class="services-grid">
         <div class="service-card" onclick="openService('gmail', null)">
-          <div class="service-icon" style="background:rgba(234,67,53,0.15);"><img src="https://www.google.com/s2/favicons?domain=mail.google.com&sz=64" alt="Gmail"></div>
+          <div class="service-icon" style="background:rgba(234,67,53,0.15);">✉️</div>
           <div class="service-name">Gmail</div>
           <div class="service-desc">メールを確認する</div>
         </div>
         <div class="service-card" onclick="openService('chat', null)">
-          <div class="service-icon" style="background:rgba(26,115,232,0.15);"><img src="https://www.google.com/s2/favicons?domain=chat.google.com&sz=64" alt="Chat"></div>
+          <div class="service-icon" style="background:rgba(26,115,232,0.15);">💬</div>
           <div class="service-name">Google Chat</div>
           <div class="service-desc">チャットを確認する</div>
         </div>
         <div class="service-card" onclick="openService('calendar', null)">
-          <div class="service-icon" style="background:rgba(66,133,244,0.15);"><img src="https://www.google.com/s2/favicons?domain=calendar.google.com&sz=64" alt="Calendar"></div>
+          <div class="service-icon" style="background:rgba(66,133,244,0.15);">📅</div>
           <div class="service-name">カレンダー</div>
           <div class="service-desc">予定を確認する</div>
         </div>
         <div class="service-card" onclick="openService('line', null)">
-          <div class="service-icon" style="background:rgba(0,185,0,0.15);"><img src="https://www.google.com/s2/favicons?domain=manager.line.biz&sz=64" alt="LINE"></div>
+          <div class="service-icon" style="background:rgba(0,185,0,0.15);">💚</div>
           <div class="service-name">公式LINE</div>
           <div class="service-desc">LINE管理画面</div>
         </div>
@@ -580,7 +580,7 @@ iframe {
       <div class="apps-grid">
         <div class="app-card" onclick="openService('gas', null)">
           <div class="app-top">
-            <div class="app-icon-box" style="background:rgba(79,142,247,0.15);"><img src="https://www.google.com/s2/favicons?domain=script.google.com&sz=64" alt="GAS"></div>
+            <div class="app-icon-box" style="background:rgba(79,142,247,0.15);">🤖</div>
             <div>
               <div class="app-name">予定自動登録アプリ</div>
               <span class="app-tag tag-active">稼働中</span>
@@ -623,7 +623,7 @@ iframe {
       <div class="apps-grid" id="apps-grid">
         <div class="app-card" onclick="openService('gas', null)">
           <div class="app-top">
-            <div class="app-icon-box" style="background:rgba(79,142,247,0.15);"><img src="https://www.google.com/s2/favicons?domain=script.google.com&sz=64" alt="GAS"></div>
+            <div class="app-icon-box" style="background:rgba(79,142,247,0.15);">🤖</div>
             <div>
               <div class="app-name">予定自動登録アプリ</div>
               <span class="app-tag tag-active">稼働中</span>
