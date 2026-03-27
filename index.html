@@ -82,7 +82,7 @@ header {
 /* ── Layout ── */
 .layout {
   display: grid;
-  grid-template-columns: 220px 1fr;
+  grid-template-columns: 260px 1fr;
   min-height: calc(100vh - 65px);
 }
 
@@ -96,21 +96,21 @@ nav {
 }
 
 .nav-section {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
   color: var(--text-muted);
   letter-spacing: 1.2px;
   text-transform: uppercase;
-  padding: 14px 10px 6px;
+  padding: 16px 10px 8px;
 }
 
 .nav-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 9px 10px;
-  border-radius: 8px;
-  font-size: 13.5px;
+  gap: 12px;
+  padding: 11px 12px;
+  border-radius: 10px;
+  font-size: 15px;
   color: var(--text-secondary);
   cursor: pointer;
   transition: all 0.15s;
@@ -121,7 +121,7 @@ nav {
 .nav-item:hover { background: var(--bg-card-hover); color: var(--text-primary); border-color: var(--border); }
 .nav-item.active { background: rgba(79,142,247,0.12); color: var(--accent-blue); border-color: rgba(79,142,247,0.2); }
 
-.nav-icon { width: 20px; text-align: center; font-size: 15px; flex-shrink: 0; }
+.nav-icon { width: 26px; text-align: center; font-size: 20px; flex-shrink: 0; }
 .nav-badge {
   margin-left: auto;
   background: var(--accent-red);
@@ -139,8 +139,8 @@ main { padding: 24px 28px; overflow-y: auto; }
 
 /* ── Dashboard ── */
 .welcome { margin-bottom: 24px; }
-.welcome h1 { font-size: 22px; font-weight: 600; letter-spacing: -0.5px; }
-.welcome p { color: var(--text-secondary); font-size: 13.5px; margin-top: 4px; }
+.welcome h1 { font-size: 26px; font-weight: 600; letter-spacing: -0.5px; }
+.welcome p { color: var(--text-secondary); font-size: 15px; margin-top: 4px; }
 
 .stats-row {
   display: grid;
@@ -207,12 +207,12 @@ main { padding: 24px 28px; overflow-y: auto; }
 .service-card {
   background: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 20px 16px;
+  border-radius: 16px;
+  padding: 28px 16px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 14px;
   cursor: pointer;
   transition: all 0.15s;
   text-decoration: none;
@@ -226,20 +226,20 @@ main { padding: 24px 28px; overflow-y: auto; }
 }
 
 .service-icon {
-  width: 48px; height: 48px;
-  border-radius: 14px;
+  width: 72px; height: 72px;
+  border-radius: 18px;
   display: flex; align-items: center; justify-content: center;
-  font-size: 22px;
+  font-size: 32px;
   overflow: hidden;
 }
 
 .service-icon img {
-  width: 32px; height: 32px;
+  width: 52px; height: 52px;
   object-fit: contain;
 }
 
-.service-name { font-size: 13px; font-weight: 500; }
-.service-desc { font-size: 11px; color: var(--text-muted); text-align: center; }
+.service-name { font-size: 15px; font-weight: 500; }
+.service-desc { font-size: 12px; color: var(--text-muted); text-align: center; }
 
 /* ── Apps Grid ── */
 .apps-grid {
@@ -267,25 +267,25 @@ main { padding: 24px 28px; overflow-y: auto; }
 .app-top { display: flex; align-items: center; gap: 12px; }
 
 .nav-favicon {
-  width: 18px; height: 18px;
+  width: 22px; height: 22px;
   object-fit: contain;
   border-radius: 3px;
 }
 
 .app-icon-box {
-  width: 40px; height: 40px;
-  border-radius: 10px;
+  width: 56px; height: 56px;
+  border-radius: 14px;
   display: flex; align-items: center; justify-content: center;
-  font-size: 20px; flex-shrink: 0;
+  font-size: 26px; flex-shrink: 0;
   overflow: hidden;
 }
 
 .app-icon-box img {
-  width: 26px; height: 26px;
+  width: 38px; height: 38px;
   object-fit: contain;
 }
 
-.app-name { font-size: 13.5px; font-weight: 500; }
+.app-name { font-size: 15px; font-weight: 500; }
 
 .app-tag {
   display: inline-block;
